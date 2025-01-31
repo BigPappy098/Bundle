@@ -1,50 +1,243 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Pump Bundler Mobile</title>
+  <title>Pump Bundler Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode.js/lib/qrcode.min.js"></script>
   <style>
-    /* Mobile-first styles */
-    body { font-family: -apple-system, sans-serif; padding: 20px; }
-    button { padding: 10px; margin: 5px; width: 100%; }
+    /* Mobile-optimized UI */
+    body { font-family: -apple-system, sans-serif; padding: 15px; background: #1a1a1a; color: white; }
+    .wallet-card { background: #2d2d2d; padding: 15px; margin: 10px 0; border-radius: 12px; }
+    button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; margin: 5px 0; }
+    input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; background: #333; color: white; }
   </style>
 </head>
 <body>
-  <h1>Pump Bundler</h1>
+  <h1 style="text-align: center;">🔋 Pump Bundler</h1>
   
-  <button onclick="generateWallet('launch')">Generate Launch Wallet</button>
-  <button onclick="generateWallet('bump')">Generate Bump Wallet</button>
-  
-  <div id="wallets"></div>
+  <!-- Password Setup -->
+  <div id="passwordSection">
+    <input type="password" id="password" placeholder="Set encryption password">
+    <button onclick="initializeApp()">Initialize</button>
+  </div>
 
-  <script>
-    // Secure key storage (IndexedDB)
-    const db = indexedDB.open("pump-bundler", 1);
+  <!-- Main Interface -->
+  <div id="appInterface" style="display: none;">
+    <button onclick="generateNewWallet()">➕ New Wallet</button>
+    <div id="walletList"></div>
+  </div>
+
+  <!-- Withdrawal Modal -->
+  <div id="withdrawModal" style="display: none; position: fixed; top: 20%; background: #333; padding: 20px; border-radius: 12px; width: 80%; left: 10%;">
+    <h3>Withdraw SOL</h3>
+    <input type="number" id="withdrawAmount" placeholder="Amount (SOL)">
+    <input type="text" id="recipientAddress" placeholder="Recipient address">
+    <button onclick="processWithdrawal()">Confirm Withdrawal</button>
+    <button onclick="closeModal()" style="background: #ff3b30;">Cancel</button>
+  </div>
+
+<script src="https://unpkg.com/@solana/web3.js@1.70.1/lib/index.iife.js"></script>
+<script>
+const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com");
+let currentWallet = null;
+
+// 1. Initialize App with Encryption
+async function initializeApp() {
+  const password = document.getElementById('password').value;
+  if (!password) return alert("Password required!");
+  
+  // Store password in memory (never saved)
+  window.appPassword = password;
+  
+  // Show main interface
+  document.getElementById('passwordSection').style.display = 'none';
+  document.getElementById('appInterface').style.display = 'block';
+  
+  // Load existing wallets
+  loadWallets();
+}
+
+// 2. Generate New Wallet (Secure)
+async function generateNewWallet() {
+  const keypair = solanaWeb3.Keypair.generate();
+  
+  // Encrypt private key
+  const encryptedKey = await encryptData(keypair.secretKey);
+  
+  // Store in localStorage
+  const walletData = {
+    publicKey: keypair.publicKey.toString(),
+    encryptedKey,
+    balance: 0
+  };
+  
+  saveWallet(walletData);
+  displayWallet(walletData);
+  updateBalances();
+}
+
+// 3. Display Wallet with Full Controls
+function displayWallet(wallet) {
+  const qrcode = new QRCode(document.createElement('div'), {
+    text: wallet.publicKey,
+    width: 128,
+    height: 128
+  });
+
+  const walletCard = document.createElement('div');
+  walletCard.className = 'wallet-card';
+  walletCard.innerHTML = `
+    <h3>${wallet.publicKey.slice(0, 12)}... ➡️ QR</h3>
+    <div>Balance: ◎${wallet.balance}</div>
+    <div id="qrcode-${wallet.publicKey}"></div>
+    <button onclick="showDeposit('${wallet.publicKey}')">Deposit</button>
+    <button onclick="showWithdraw('${wallet.publicKey}')">Withdraw</button>
+  `;
+  
+  document.getElementById('walletList').appendChild(walletCard);
+  document.getElementById(`qrcode-${wallet.publicKey}`).appendChild(qrcode._el);
+}
+
+// 4. Deposit Interface
+function showDeposit(publicKey) {
+  const wallet = getWallet(publicKey);
+  alert(`Send SOL to:\n${wallet.publicKey}\n\nScan QR code for easy copy!`);
+}
+
+// 5. Withdrawal System
+async function showWithdraw(publicKey) {
+  currentWallet = getWallet(publicKey);
+  document.getElementById('withdrawModal').style.display = 'block';
+}
+
+async function processWithdrawal() {
+  const amount = parseFloat(document.getElementById('withdrawAmount').value);
+  const recipient = document.getElementById('recipientAddress').value;
+  
+  if (!amount || !recipient) return alert("Missing fields!");
+  
+  try {
+    // Decrypt private key
+    const secretKey = await decryptData(currentWallet.encryptedKey);
+    const keypair = solanaWeb3.Keypair.fromSecretKey(new Uint8Array(secretKey));
     
-    function generateWallet(type) {
-      const keypair = solanaWeb3.Keypair.generate();
-      const encrypted = btoa(JSON.stringify(keypair.secretKey));
-      
-      // Store encrypted
-      localStorage.setItem(keypair.publicKey.toString(), encrypted);
-      
-      // Update UI
-      document.getElementById("wallets").innerHTML += `
-        <div style="margin: 10px; padding: 10px; border: 1px solid #ccc;">
-          <p>Type: ${type}</p>
-          <p>Public Key: ${keypair.publicKey.toString().slice(0, 12)}...</p>
-          <button onclick="sell('${keypair.publicKey}', 25)">Sell 25%</button>
-        </div>
-      `;
-    }
+    // Create transaction
+    const transaction = new solanaWeb3.Transaction().add(
+      solanaWeb3.SystemProgram.transfer({
+        fromPubkey: keypair.publicKey,
+        toPubkey: new solanaWeb3.PublicKey(recipient),
+        lamports: amount * solanaWeb3.LAMPORTS_PER_SOL
+      })
+    );
+    
+    // Sign and send
+    const signature = await solanaWeb3.sendAndConfirmTransaction(
+      connection,
+      transaction,
+      [keypair]
+    );
+    
+    alert(`Withdrawal successful!\nTX: ${signature}`);
+    closeModal();
+    updateBalances();
+  } catch (error) {
+    alert(`Withdrawal failed: ${error.message}`);
+  }
+}
 
-    async function sell(publicKey, percent) {
-      const encrypted = localStorage.getItem(publicKey);
-      const secretKey = JSON.parse(atob(encrypted));
-      // Implement sell logic here
-      alert(`Sold ${percent}% of ${publicKey.slice(0, 12)}...`);
+// 6. Balance Updater
+async function updateBalances() {
+  const wallets = JSON.parse(localStorage.getItem('wallets') || '[]');
+  
+  for (const wallet of wallets) {
+    try {
+      const balance = await connection.getBalance(
+        new solanaWeb3.PublicKey(wallet.publicKey)
+      );
+      wallet.balance = balance / solanaWeb3.LAMPORTS_PER_SOL;
+    } catch (error) {
+      console.error("Balance check failed:", error);
     }
-  </script>
-  <script src="https://unpkg.com/@solana/web3.js@1.70.1/lib/index.iife.js"></script>
+  }
+  
+  localStorage.setItem('wallets', JSON.stringify(wallets));
+  refreshUI();
+}
+
+// 7. Security Functions
+async function encryptData(data) {
+  const encoded = new TextEncoder().encode(window.appPassword);
+  const key = await crypto.subtle.importKey('raw', encoded, 'PBKDF2', false, ['deriveKey']);
+  
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const derivedKey = await crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    key,
+    { name: 'AES-GCM', length: 256 },
+    true,
+    ['encrypt', 'decrypt']
+  );
+  
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encrypted = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    derivedKey,
+    new Uint8Array(data)
+  );
+  
+  return JSON.stringify({ salt, iv, data: Array.from(new Uint8Array(encrypted)) });
+}
+
+async function decryptData(encryptedData) {
+  const { salt, iv, data } = JSON.parse(encryptedData);
+  const encoded = new TextEncoder().encode(window.appPassword);
+  
+  const key = await crypto.subtle.importKey('raw', encoded, 'PBKDF2', false, ['deriveKey']);
+  const derivedKey = await crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    key,
+    { name: 'AES-GCM', length: 256 },
+    true,
+    ['decrypt']
+  );
+  
+  const decrypted = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv },
+    derivedKey,
+    new Uint8Array(data)
+  );
+  
+  return new Uint8Array(decrypted);
+}
+
+// Helper functions
+function saveWallet(wallet) {
+  const wallets = JSON.parse(localStorage.getItem('wallets') || '[]');
+  wallets.push(wallet);
+  localStorage.setItem('wallets', JSON.stringify(wallets));
+}
+
+function getWallet(publicKey) {
+  return JSON.parse(localStorage.getItem('wallets')).find(w => w.publicKey === publicKey);
+}
+
+function refreshUI() {
+  document.getElementById('walletList').innerHTML = '';
+  JSON.parse(localStorage.getItem('wallets') || '[]').forEach(displayWallet);
+}
+
+function closeModal() {
+  document.getElementById('withdrawModal').style.display = 'none';
+  currentWallet = null;
+}
+
+// Initial load
+if (localStorage.getItem('wallets')) {
+  document.getElementById('passwordSection').innerHTML = `
+    <input type="password" id="password" placeholder="Enter password">
+    <button onclick="initializeApp()">Unlock</button>
+  `;
+}
+</script>
 </body>
 </html>
