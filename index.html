@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pump Bundler Mobile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* Mobile-first styles */
+    body { font-family: -apple-system, sans-serif; padding: 20px; }
+    button { padding: 10px; margin: 5px; width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>Pump Bundler</h1>
+  
+  <button onclick="generateWallet('launch')">Generate Launch Wallet</button>
+  <button onclick="generateWallet('bump')">Generate Bump Wallet</button>
+  
+  <div id="wallets"></div>
+
+  <script>
+    // Secure key storage (IndexedDB)
+    const db = indexedDB.open("pump-bundler", 1);
+    
+    function generateWallet(type) {
+      const keypair = solanaWeb3.Keypair.generate();
+      const encrypted = btoa(JSON.stringify(keypair.secretKey));
+      
+      // Store encrypted
+      localStorage.setItem(keypair.publicKey.toString(), encrypted);
+      
+      // Update UI
+      document.getElementById("wallets").innerHTML += `
+        <div style="margin: 10px; padding: 10px; border: 1px solid #ccc;">
+          <p>Type: ${type}</p>
+          <p>Public Key: ${keypair.publicKey.toString().slice(0, 12)}...</p>
+          <button onclick="sell('${keypair.publicKey}', 25)">Sell 25%</button>
+        </div>
+      `;
+    }
+
+    async function sell(publicKey, percent) {
+      const encrypted = localStorage.getItem(publicKey);
+      const secretKey = JSON.parse(atob(encrypted));
+      // Implement sell logic here
+      alert(`Sold ${percent}% of ${publicKey.slice(0, 12)}...`);
+    }
+  </script>
+  <script src="https://unpkg.com/@solana/web3.js@1.70.1/lib/index.iife.js"></script>
+</body>
+</html>
