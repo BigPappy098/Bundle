@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login - Pump Bundler</title>
+  <title>Auth - Pump Bundler</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,19 +11,30 @@
       <button class="tab" onclick="switchTab('register')">Register</button>
     </div>
 
+    <!-- Login Form -->
     <form id="loginForm" class="form active" onsubmit="handleLogin(event)">
-      <input type="text" id="username" placeholder="Username" required>
-      <input type="password" id="password" placeholder="Password" required>
+      <input type="text" placeholder="Username" required>
+      <input type="password" placeholder="Password" required>
       <button type="submit">Sign In</button>
     </form>
 
+    <!-- Registration Form -->
     <form id="registerForm" class="form" onsubmit="handleRegister(event)">
-      <input type="text" id="regUsername" placeholder="Username" required>
-      <input type="password" id="regPassword" placeholder="Password" required>
+      <input type="text" placeholder="Username" required>
+      <input type="password" placeholder="Password" required>
       <button type="submit">Create Account</button>
     </form>
   </div>
 
   <script src="app.js"></script>
+  <script>
+    // Tab Switching
+    function switchTab(tab) {
+      document.querySelectorAll('.tab, .form').forEach(el => {
+        el.classList.remove('active');
+        if (el.classList.contains(tab)) el.classList.add('active');
+      });
+    }
+  </script>
 </body>
 </html>
