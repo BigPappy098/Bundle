@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard - Pump Bundler</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="dashboard.html">🏠 Dashboard</a>
+      <a href="#" onclick="handleLogout()">🔒 Logout</a>
+    </nav>
+  </header>
+
+  <div class="dashboard-container">
+    <!-- Side Navigation -->
+    <aside class="sidebar">
+      <button class="active" data-view="stats">📊 Stats</button>
+      <button data-view="launch">🚀 Launch</button>
+      <button data-view="wallets">💼 Wallets</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Stats View -->
+      <section id="statsView" class="view active">
+        <h2>Project Statistics</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Total Launches</h3>
+            <p id="totalLaunches">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Active Wallets</h3>
+            <p id="activeWallets">0</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Launch View -->
+      <section id="launchView" class="view">
+        <h2>Launch New Token</h2>
+        <form onsubmit="handleLaunch(event)">
+          <input type="text" id="tokenName" placeholder="Token Name" required>
+          <input type="text" id="tokenSymbol" placeholder="Symbol (e.g., PUMP)" required>
+          <input type="file" id="tokenLogo" accept="image/*" required>
+          <button type="submit">Launch Now</button>
+        </form>
+      </section>
+
+      <!-- Wallets View -->
+      <section id="walletsView" class="view">
+        <h2>Wallet Management</h2>
+        <button onclick="createWallet()">+ Create Wallet</button>
+        <div class="wallet-grid" id="walletGrid"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
