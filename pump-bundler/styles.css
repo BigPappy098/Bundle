@@ -1,15 +1,15 @@
 /* styles.css */
 /* Updated Color Scheme */
 :root {
-  --primary: #3B82F6;       /* Vibrant blue */
+  --primary: #3B82F6;       /* Primary blue */
   --primary-hover: #2563EB; 
-  --background: #111827;    /* Dark blue-gray background */
+  --background: #111827;    /* Dark background */
   --surface: #1F2937;       /* Card backgrounds */
-  --text: #F9FAFB;          /* Nearly white text */
+  --text: #F9FAFB;          /* White text */
   --text-muted: #9CA3AF;    /* Gray text */
   --border: #374151;        /* Border color */
-  --error: #EF4444;         /* Red for errors */
-  --success: #10B981;       /* Green for success */
+  --error: #EF4444;         /* Error red */
+  --success: #10B981;       /* Success green */
 }
 
 /* Base Styles */
@@ -98,7 +98,35 @@ button:hover {
   background: var(--primary-hover);
 }
 
-/* Dashboard Styles */
+/* Alert System */
+#alerts {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+.alert {
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  margin: 0.5rem;
+  min-width: 300px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.alert.success {
+  background: var(--success);
+  color: white;
+}
+
+.alert.error {
+  background: var(--error);
+  color: white;
+}
+
+/* Dashboard Layout */
 .dashboard {
   display: grid;
   grid-template-columns: 240px 1fr;
@@ -184,7 +212,7 @@ button:hover {
 }
 
 /* Form Elements */
-.form-section {
+.form-group {
   margin-bottom: 1.5rem;
 }
 
@@ -239,4 +267,10 @@ select {
 
 .mb-4 {
   margin-bottom: 1rem;
+}
+
+.close {
+  float: right;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
