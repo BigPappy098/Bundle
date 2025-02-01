@@ -1,32 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Auth - Pump Bundler</title>
+  <title>Login - Pump Bundler</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="auth-container">
-    <div class="auth-tabs">
-      <button class="active" onclick="showTab('login')">Login</button>
-      <button onclick="showTab('register')">Register</button>
+    <!-- Tabs -->
+    <div class="tab-buttons">
+      <button class="tab-button active" onclick="switchTab('login')">Login</button>
+      <button class="tab-button" onclick="switchTab('register')">Register</button>
     </div>
 
-    <!-- Login Form -->
-    <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
-      <input type="text" id="loginEmail" placeholder="Email/Username" required>
-      <input type="password" id="loginPassword" placeholder="Password" required>
+    <!-- Login Form (Default Visible) -->
+    <form id="loginForm" class="auth-form active">
+      <input type="text" placeholder="Username" required>
+      <input type="password" placeholder="Password" required>
       <button type="submit">Sign In</button>
     </form>
 
-    <!-- Registration Form -->
-    <form id="registerForm" class="auth-form" onsubmit="handleRegister(event)">
-      <input type="email" id="regEmail" placeholder="Email" required>
-      <input type="text" id="regUsername" placeholder="Username" required>
-      <input type="password" id="regPassword" placeholder="Password" required>
+    <!-- Registration Form (Hidden by Default) -->
+    <form id="registerForm" class="auth-form">
+      <input type="text" placeholder="Username" required>
+      <input type="email" placeholder="Email" required>
+      <input type="password" placeholder="Password" required>
       <button type="submit">Create Account</button>
     </form>
   </div>
 
-  <script src="app.js"></script>
+  <script>
+    // Tab Switching Logic
+    function switchTab(tabId) {
+      // Toggle button states
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toLowerCase().includes(tabId));
+      });
+
+      // Toggle form visibility
+      document.getElementById('loginForm').classList.toggle('active', tabId === 'login');
+      document.getElementById('registerForm').classList.toggle('active', tabId === 'register');
+    }
+  </script>
 </body>
 </html>
