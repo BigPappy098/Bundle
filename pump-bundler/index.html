@@ -1,133 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Pump Bundler Lite</title>
+  <title>Pump Bundler</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    :root {
-      --primary: #007AFF;
-      --background: #0A0A0A;
-    }
-
-    body {
-      font-family: -apple-system, sans-serif;
-      background: var(--background);
-      color: white;
-      padding: 20px;
-    }
-
-    button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      margin: 5px 0;
-      width: 100%;
-    }
-
-    .wallet-card {
-      background: #1A1A1A;
-      padding: 15px;
-      border-radius: 12px;
-      margin: 10px 0;
-    }
-  </style>
+  <script>
+    // Redirect based on auth status
+    (function() {
+      const user = localStorage.getItem('pb:user');
+      window.location.href = user ? 'dashboard.html' : 'auth.html';
+    })();
+  </script>
 </head>
 <body>
-  <div id="auth">
-    <input type="password" id="password" placeholder="Set Master Password">
-    <button onclick="initApp()">Start</button>
+  <div class="redirect-notice">
+    <h2>Redirecting...</h2>
   </div>
-
-  <div id="app" style="display:none;">
-    <!-- Wallet Creation -->
-    <button onclick="createWallet('launch')">Create Launch Wallet</button>
-    <button onclick="createWallet('bump')">Create Bump Wallet</button>
-    <div id="wallets"></div>
-
-    <!-- Token Launch -->
-    <input type="text" id="tokenName" placeholder="Token Name">
-    <input type="text" id="tokenSymbol" placeholder="Token Symbol">
-    <button onclick="launchToken()">Launch Token</button>
-  </div>
-
-  <script>
-    let wallets = [];
-    let password = "";
-
-    // 1. Initialize App
-    function initApp() {
-      password = document.getElementById('password').value;
-      document.getElementById('auth').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-    }
-
-    // 2. Single Wallet Creation
-    function createWallet(type) {
-      const keypair = solanaWeb3.Keypair.generate();
-      
-      // Simple encryption (upgrade to Web Crypto later)
-      const encryptedKey = btoa(JSON.stringify(Array.from(keypair.secretKey)));
-      
-      wallets.push({
-        type,
-        publicKey: keypair.publicKey.toString(),
-        secretKey: encryptedKey
-      });
-
-      updateWalletDisplay();
-    }
-
-    // 3. Display Wallets
-    function updateWalletDisplay() {
-      const container = document.getElementById('wallets');
-      container.innerHTML = wallets.map(wallet => `
-        <div class="wallet-card">
-          <p>${wallet.publicKey.slice(0, 12)}... (${wallet.type})</p>
-          <button onclick="sell('${wallet.publicKey}', 25)">Sell 25%</button>
-        </div>
-      `).join('');
-    }
-
-    // 4. Basic Token Launch
-    async function launchToken() {
-      const name = document.getElementById('tokenName').value;
-      const symbol = document.getElementById('tokenSymbol').value;
-      
-      try {
-        // Simple API call example
-        const response = await fetch('https://pumpportal.fun/api/trade-local', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: "create",
-            name,
-            symbol,
-            denominatedInSol: true,
-            amount: 1
-          })
-        });
-
-        const data = await response.json();
-        alert(`Token launched! TX: ${data.signature}`);
-      } catch (error) {
-        alert(`Error: ${error.message}`);
-      }
-    }
-
-    // 5. Sell Functionality
-    async function sell(publicKey, percent) {
-      const wallet = wallets.find(w => w.publicKey === publicKey);
-      if (!wallet) return;
-
-      // Simple decryption
-      const secretKey = new Uint8Array(JSON.parse(atob(wallet.secretKey)));
-      const keypair = solanaWeb3.Keypair.fromSecretKey(secretKey);
-      
-      alert(`Would sell ${percent}% from ${wallet.publicKey.slice(0, 12)}...`);
-    }
-  </script>
-  <script src="https://unpkg.com/@solana/web3.js@1.70.1/lib/index.iife.js"></script>
 </body>
 </html>
