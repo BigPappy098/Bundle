@@ -5,30 +5,29 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="dashboard-container">
-    <!-- Sidebar Navigation -->
+  <div class="dashboard">
     <div class="sidebar">
-      <h2>Navigation</h2>
-      <button class="nav-btn active" data-target="statsView">📊 Stats</button>
-      <button class="nav-btn" data-target="launchView">🚀 Launch</button>
-      <button class="nav-btn" data-target="walletsView">💼 Wallets</button>
+      <h2>Pump Bundler</h2>
+      <button class="nav-button active" data-view="stats">📊 Stats</button>
+      <button class="nav-button" data-view="launch">🚀 Launch</button>
+      <button class="nav-button" data-view="wallets">💼 Wallets</button>
+      <button class="nav-button" onclick="logout()">🔒 Logout</button>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
+    <div class="content-area">
       <!-- Stats View -->
-      <div id="statsView" class="content-view active">
-        <h3>Project Statistics</h3>
-        <div class="stats-card">
-          <p>Total Launches: <span id="launchCount">0</span></p>
-          <p>Active Wallets: <span id="walletCount">0</span></p>
+      <div id="statsView" class="view active">
+        <h3>Project Stats</h3>
+        <div class="stats">
+          <p>Total Wallets: <span id="walletCount">0</span></p>
+          <p>Available Balance: <span id="totalBalance">◎0.00</span></p>
         </div>
       </div>
 
       <!-- Launch View -->
-      <div id="launchView" class="content-view">
+      <div id="launchView" class="view">
         <h3>Launch New Token</h3>
-        <form id="launchForm">
+        <form onsubmit="handleLaunch(event)">
           <input type="text" placeholder="Token Name" required>
           <input type="text" placeholder="Token Symbol" required>
           <button type="submit">Deploy</button>
@@ -36,47 +35,32 @@
       </div>
 
       <!-- Wallets View -->
-      <div id="walletsView" class="content-view">
-        <h3>Wallet Management</h3>
-        <button onclick="createNewWallet()">+ New Wallet</button>
-        <div id="walletList"></div>
+      <div id="walletsView" class="view">
+        <div class="wallet-header">
+          <h3>Wallet Management</h3>
+          <button onclick="showWalletCreator()">+ New Wallet</button>
+        </div>
+
+        <div class="wallet-list" id="walletList">
+          <!-- Wallets injected via JS -->
+        </div>
       </div>
     </div>
   </div>
 
-  <script>
-    // Tab Navigation Logic
-    document.querySelectorAll('.nav-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        // Remove active class from all
-        document.querySelectorAll('.nav-btn, .content-view').forEach(el => {
-          el.classList.remove('active');
-        });
+  <!-- Wallet Creator Modal -->
+  <div id="walletModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h4>Create New Wallet</h4>
+      <select id="walletType">
+        <option value="launch">Launch Wallet</option>
+        <option value="bump">Bump Wallet</option>
+      </select>
+      <button onclick="createWallet()">Generate</button>
+    </div>
+  </div>
 
-        // Add active class to clicked
-        this.classList.add('active');
-        document.getElementById(this.dataset.target).classList.add('active');
-      });
-    });
-
-    // Wallet Creation Logic
-    let walletCounter = 0;
-    function createNewWallet() {
-      const walletDiv = document.createElement('div');
-      walletDiv.className = 'wallet-card';
-      walletDiv.innerHTML = `
-        <p>Wallet ${++walletCounter}</p>
-        <button onclick="this.parentElement.remove()">Delete</button>
-      `;
-      document.getElementById('walletList').appendChild(walletDiv);
-      updateStats();
-    }
-
-    // Stats Updater
-    function updateStats() {
-      document.getElementById('walletCount').textContent = 
-        document.querySelectorAll('.wallet-card').length;
-    }
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
