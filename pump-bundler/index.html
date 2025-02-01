@@ -4,16 +4,15 @@
   <title>Pump Bundler</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script>
-    // Redirect based on auth status
-    (function() {
-      const user = localStorage.getItem('pb:user');
-      window.location.href = user ? 'dashboard.html' : 'auth.html';
-    })();
+    // Redirect to auth if not logged in
+    if (!localStorage.getItem('pb:user')) {
+      window.location.href = 'auth.html';
+    } else {
+      window.location.href = 'dashboard.html';
+    }
   </script>
 </head>
 <body>
-  <div class="redirect-notice">
-    <h2>Redirecting...</h2>
-  </div>
+  Redirecting...
 </body>
 </html>
