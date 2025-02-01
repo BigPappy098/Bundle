@@ -1,116 +1,93 @@
-// Authentication System
+// Auth Functions
 function handleRegister(e) {
   e.preventDefault();
-  const user = {
-    email: document.getElementById('regEmail').value,
-    username: document.getElementById('regUsername').value,
-    password: document.getElementById('regPassword').value
-  };
+  const username = document.getElementById('regUsername').value;
+  const password = document.getElementById('regPassword').value;
+
+  // Generate dev wallet on registration
+  const devWallet = solanaWeb3.Keypair.generate();
   
-  localStorage.setItem('pb:user', JSON.stringify(user));
+  localStorage.setItem('pb:user', JSON.stringify({
+    username,
+    password, // Note: In production, hash this
+    devWallet: {
+      publicKey: devWallet.publicKey.toString(),
+      encryptedKey: btoa(JSON.stringify(Array.from(devWallet.secretKey)))
+    }
+  }));
+  
   window.location.href = 'dashboard.html';
 }
 
 function handleLogin(e) {
   e.preventDefault();
-  const username = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
   const user = JSON.parse(localStorage.getItem('pb:user'));
-  
-  if (user && (user.email === username || user.username === username) && user.password === password) {
-    localStorage.setItem('pb:currentUser', JSON.stringify(user));
+
+  if (user && user.username === username && user.password === password) {
     window.location.href = 'dashboard.html';
   } else {
     alert('Invalid credentials');
   }
 }
 
-// Dashboard System
-let currentToken = null;
-const wallets = [];
+// Dashboard Functions
+let wallets = [];
+
+function showWalletCreator() {
+  document.getElementById('walletModal').style.display = 'block';
+}
 
 function createWallet() {
+  const type = document.getElementById('walletType').value;
   const keypair = solanaWeb3.Keypair.generate();
-  const wallet = {
+  
+  wallets.push({
+    type,
     publicKey: keypair.publicKey.toString(),
     secretKey: btoa(JSON.stringify(Array.from(keypair.secretKey))),
-    balance: 0,
-    type: 'custodial'
-  };
+    balance: 0
+  });
   
-  wallets.push(wallet);
   updateWalletDisplay();
-  updateStats();
-}
-
-async function handleLaunch(e) {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  
-  try {
-    // 1. Upload image
-    const ipfsForm = new FormData();
-    ipfsForm.append('file', formData.get('tokenLogo'));
-    ipfsForm.append('name', formData.get('tokenName'));
-    
-    const ipfsRes = await fetch('https://pump.fun/api/ipfs', {
-      method: 'POST',
-      body: ipfsForm
-    });
-    const { metadataUri } = await ipfsRes.json();
-
-    // 2. Create token
-    const launchRes = await fetch('https://pumpportal.fun/api/trade-local', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: "create",
-        name: formData.get('tokenName'),
-        symbol: formData.get('tokenSymbol'),
-        metadataUri,
-        denominatedInSol: true,
-        amount: 1
-      })
-    });
-
-    // 3. Process transaction
-    const txData = await launchRes.arrayBuffer();
-    const tx = solanaWeb3.VersionedTransaction.deserialize(new Uint8Array(txData));
-    const keypair = solanaWeb3.Keypair.generate();
-    tx.sign([keypair]);
-    
-    const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com");
-    const signature = await connection.sendTransaction(tx);
-    
-    alert(`Token launched! TX: ${signature}`);
-    updateStats();
-    
-  } catch (error) {
-    alert(`Launch failed: ${error.message}`);
-  }
-}
-
-// UI Updates
-function updateStats() {
-  document.getElementById('totalLaunches').textContent = wallets.filter(w => w.type === 'launch').length;
-  document.getElementById('activeWallets').textContent = wallets.length;
+  closeModal();
 }
 
 function updateWalletDisplay() {
-  const container = document.getElementById('walletGrid');
+  const container = document.getElementById('walletList');
   container.innerHTML = wallets.map(wallet => `
     <div class="wallet-card">
-      <h3>${wallet.publicKey.slice(0, 12)}...</h3>
-      <p>Type: ${wallet.type}</p>
-      <button onclick="showWalletDetails('${wallet.publicKey}')">Manage</button>
+      <div>
+        <span class="wallet-type ${wallet.type}">${wallet.type.toUpperCase()}</span>
+        <p>${wallet.publicKey.slice(0, 12)}...${wallet.publicKey.slice(-4)}</p>
+      </div>
+      <div class="wallet-actions">
+        <button onclick="showDeposit('${wallet.publicKey}')">Deposit</button>
+        <button onclick="showWithdraw('${wallet.publicKey}')">Withdraw</button>
+      </div>
     </div>
   `).join('');
 }
 
 // Navigation
-document.querySelectorAll('.sidebar button').forEach(button => {
-  button.addEventListener('click', () => {
-    document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
-    document.getElementById(`${button.dataset.view}View`).classList.add('active');
+document.querySelectorAll('.nav-button').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.nav-button, .view').forEach(el => {
+      el.classList.remove('active');
+    });
+    this.classList.add('active');
+    document.getElementById(this.dataset.view).classList.add('active');
   });
 });
+
+function logout() {
+  localStorage.removeItem('pb:user');
+  window.location.href = 'auth.html';
+}
+
+// Initialize Solana Connection
+const connection = new solanaWeb3.Connection(
+  "https://api.mainnet-beta.solana.com",
+  "confirmed"
+);
