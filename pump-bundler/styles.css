@@ -1,0 +1,66 @@
+/* Base Styles */
+:root {
+    --primary: #007AFF;
+    --background: #0A0A0A;
+    --card-bg: #1A1A1A;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--background);
+    color: white;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Authentication Screen */
+.auth-screen {
+    max-width: 400px;
+    margin: 50px auto;
+    text-align: center;
+}
+
+.auth-screen input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #333;
+    border-radius: 8px;
+    background: #111;
+    color: white;
+}
+
+/* Card Layouts */
+.card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.wallet-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+/* Wallet Items */
+.wallet-item {
+    background: #252525;
+    padding: 15px;
+    border-radius: 12px;
+    position: relative;
+}
+
+.wallet-actions {
+    margin-top: 10px;
+    display: grid;
+    gap: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .wallet-grid {
+        grid-template-columns: 1fr;
+    }
+}

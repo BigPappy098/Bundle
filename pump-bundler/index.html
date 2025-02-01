@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pump Bundler Pro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="auth-screen">
+        <h1>🔐 Pump Bundler</h1>
+        <input type="password" id="masterPassword" placeholder="Set Master Password">
+        <button onclick="initializeApp()">Unlock</button>
+    </div>
+
+    <div class="main-interface">
+        <!-- Token Launch Section -->
+        <div class="card">
+            <h2>🚀 Launch New Token</h2>
+            <input type="text" id="tokenName" placeholder="Token Name">
+            <input type="text" id="tokenSymbol" placeholder="Token Symbol">
+            <input type="file" id="tokenLogo" accept="image/*">
+            <button onclick="handleTokenLaunch()">Deploy Token</button>
+        </div>
+
+        <!-- Wallet Management -->
+        <div class="card">
+            <h2>💼 Wallet Controls</h2>
+            <div class="wallet-grid" id="walletGrid"></div>
+            <div class="action-bar">
+                <button onclick="generateWallets('launch', 50)">Generate 50 Launch Wallets</button>
+                <button onclick="generateWallets('bump', 20)">Generate 20 Bump Wallets</button>
+            </div>
+        </div>
+
+        <!-- Automation Controls -->
+        <div class="card">
+            <h2>🤖 Bump Automation</h2>
+            <div class="automation-controls">
+                <input type="number" id="bumpInterval" value="5" min="1"> mins
+                <input type="number" id="bumpAmount" value="0.01" step="0.001"> SOL
+                <button id="automationToggle" onclick="toggleAutomation()">Start Bumping</button>
+            </div>
+            <div id="automationStatus"></div>
+        </div>
+    </div>
+
+    <!-- Transaction Modals -->
+    <div id="qrModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="qrCode"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode.js/lib/qrcode.min.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@1.70.1/lib/index.iife.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
