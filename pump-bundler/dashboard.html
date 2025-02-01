@@ -5,58 +5,78 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <nav>
-      <a href="dashboard.html">🏠 Dashboard</a>
-      <a href="#" onclick="handleLogout()">🔒 Logout</a>
-    </nav>
-  </header>
-
   <div class="dashboard-container">
-    <!-- Side Navigation -->
-    <aside class="sidebar">
-      <button class="active" data-view="stats">📊 Stats</button>
-      <button data-view="launch">🚀 Launch</button>
-      <button data-view="wallets">💼 Wallets</button>
-    </aside>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+      <h2>Navigation</h2>
+      <button class="nav-btn active" data-target="statsView">📊 Stats</button>
+      <button class="nav-btn" data-target="launchView">🚀 Launch</button>
+      <button class="nav-btn" data-target="walletsView">💼 Wallets</button>
+    </div>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <div class="main-content">
       <!-- Stats View -->
-      <section id="statsView" class="view active">
-        <h2>Project Statistics</h2>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <h3>Total Launches</h3>
-            <p id="totalLaunches">0</p>
-          </div>
-          <div class="stat-card">
-            <h3>Active Wallets</h3>
-            <p id="activeWallets">0</p>
-          </div>
+      <div id="statsView" class="content-view active">
+        <h3>Project Statistics</h3>
+        <div class="stats-card">
+          <p>Total Launches: <span id="launchCount">0</span></p>
+          <p>Active Wallets: <span id="walletCount">0</span></p>
         </div>
-      </section>
+      </div>
 
       <!-- Launch View -->
-      <section id="launchView" class="view">
-        <h2>Launch New Token</h2>
-        <form onsubmit="handleLaunch(event)">
-          <input type="text" id="tokenName" placeholder="Token Name" required>
-          <input type="text" id="tokenSymbol" placeholder="Symbol (e.g., PUMP)" required>
-          <input type="file" id="tokenLogo" accept="image/*" required>
-          <button type="submit">Launch Now</button>
+      <div id="launchView" class="content-view">
+        <h3>Launch New Token</h3>
+        <form id="launchForm">
+          <input type="text" placeholder="Token Name" required>
+          <input type="text" placeholder="Token Symbol" required>
+          <button type="submit">Deploy</button>
         </form>
-      </section>
+      </div>
 
       <!-- Wallets View -->
-      <section id="walletsView" class="view">
-        <h2>Wallet Management</h2>
-        <button onclick="createWallet()">+ Create Wallet</button>
-        <div class="wallet-grid" id="walletGrid"></div>
-      </section>
-    </main>
+      <div id="walletsView" class="content-view">
+        <h3>Wallet Management</h3>
+        <button onclick="createNewWallet()">+ New Wallet</button>
+        <div id="walletList"></div>
+      </div>
+    </div>
   </div>
 
-  <script src="app.js"></script>
+  <script>
+    // Tab Navigation Logic
+    document.querySelectorAll('.nav-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove active class from all
+        document.querySelectorAll('.nav-btn, .content-view').forEach(el => {
+          el.classList.remove('active');
+        });
+
+        // Add active class to clicked
+        this.classList.add('active');
+        document.getElementById(this.dataset.target).classList.add('active');
+      });
+    });
+
+    // Wallet Creation Logic
+    let walletCounter = 0;
+    function createNewWallet() {
+      const walletDiv = document.createElement('div');
+      walletDiv.className = 'wallet-card';
+      walletDiv.innerHTML = `
+        <p>Wallet ${++walletCounter}</p>
+        <button onclick="this.parentElement.remove()">Delete</button>
+      `;
+      document.getElementById('walletList').appendChild(walletDiv);
+      updateStats();
+    }
+
+    // Stats Updater
+    function updateStats() {
+      document.getElementById('walletCount').textContent = 
+        document.querySelectorAll('.wallet-card').length;
+    }
+  </script>
 </body>
 </html>
