@@ -1,40 +1,95 @@
-<!-- Updated Launch View -->
-<div id="launchView" class="view">
-  <h3>🚀 Launch New Token</h3>
-  <form onsubmit="handleLaunch(event)">
-    <input type="text" name="name" placeholder="Token Name" required>
-    <input type="text" name="symbol" placeholder="Symbol (e.g., PUMP)" required>
-    <input type="number" name="supply" placeholder="Total Supply" required>
-    <input type="file" name="image" accept="image/*" required>
-    <input type="number" name="amount" step="0.01" placeholder="SOL Amount" required>
-    
-    <div class="form-section">
-      <label>Bundled Buy Group:</label>
-      <select name="bundledGroup">
-        <option value="">Create New Group</option>
-        ${walletGroups.bundled.map(g => `
-          <option value="${g.id}">${g.name}</option>
-        `).join('')}
-      </select>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard - Pump Bundler</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="dashboard">
+    <div class="sidebar">
+      <h2>Pump Bundler</h2>
+      <button class="nav-button active" data-view="stats">📊 Stats</button>
+      <button class="nav-button" data-view="launch">🚀 Launch</button>
+      <button class="nav-button" data-view="groups">🔗 Groups</button>
+      <button class="nav-button" data-view="wallets">💼 Wallets</button>
+      <button class="nav-button" onclick="logout()">🔒 Logout</button>
     </div>
 
-    <button type="submit">Launch Token</button>
-  </form>
-</div>
-
-<!-- New Group Management -->
-<div id="groupsView" class="view">
-  <h3>🔗 Wallet Groups</h3>
-  <button onclick="createWalletGroup('bundled')">New Bundled Group</button>
-  <button onclick="createWalletGroup('bump')">New Bump Group</button>
-  
-  <div class="group-list">
-    ${walletGroups.bundled.map(group => `
-      <div class="group-card">
-        <h4>${group.name}</h4>
-        <p>Wallets: ${group.wallets.length}</p>
-        <button onclick="manageGroup('${group.id}')">Manage</button>
+    <div class="content-area">
+      <!-- Stats View -->
+      <div id="statsView" class="view active">
+        <h3>📈 Project Statistics</h3>
+        <div class="stats-card">
+          <p>Total Launches: <span id="totalLaunches">0</span></p>
+          <p>Active Groups: <span id="activeGroups">0</span></p>
+        </div>
       </div>
-    `).join('')}
+
+      <!-- Launch View -->
+      <div id="launchView" class="view">
+        <h3>🚀 Launch New Token</h3>
+        <form onsubmit="handleLaunch(event)">
+          <div class="form-group">
+            <label>Token Name</label>
+            <input type="text" name="name" required>
+          </div>
+          <div class="form-group">
+            <label>Token Symbol</label>
+            <input type="text" name="symbol" required>
+          </div>
+          <div class="form-group">
+            <label>Total Supply</label>
+            <input type="number" name="supply" required>
+          </div>
+          <div class="form-group">
+            <label>Initial SOL Amount</label>
+            <input type="number" step="0.01" name="amount" required>
+          </div>
+          <div class="form-group">
+            <label>Bundled Buy Group</label>
+            <select name="bundledGroup" id="bundledGroupSelect"></select>
+          </div>
+          <button type="submit">Launch Token</button>
+        </form>
+      </div>
+
+      <!-- Groups View -->
+      <div id="groupsView" class="view">
+        <div class="view-header">
+          <h3>🔗 Wallet Groups</h3>
+          <div>
+            <button onclick="createGroup('bundled')">New Bundled Group</button>
+            <button onclick="createGroup('bump')">New Bump Group</button>
+          </div>
+        </div>
+        <div id="groupList"></div>
+      </div>
+
+      <!-- Wallets View -->
+      <div id="walletsView" class="view">
+        <div class="view-header">
+          <h3>💼 Wallet Management</h3>
+          <button onclick="showWalletCreator()">+ New Wallet</button>
+        </div>
+        <div id="walletList" class="wallet-grid"></div>
+      </div>
+    </div>
   </div>
-</div>
+
+  <!-- Wallet Creator Modal -->
+  <div id="walletModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h4>Create New Wallet</h4>
+      <select id="walletType">
+        <option value="launch">Launch Wallet</option>
+        <option value="bump">Bump Wallet</option>
+      </select>
+      <button onclick="createWallet()">Generate</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@solana/web3.js@1.70.1/lib/index.iife.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
