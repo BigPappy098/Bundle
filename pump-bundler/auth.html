@@ -6,21 +6,19 @@
 </head>
 <body>
   <div id="alerts"></div>
-  
+
   <div class="auth-container">
     <div class="tabs">
       <button class="tab active" onclick="switchTab('login')">Login</button>
       <button class="tab" onclick="switchTab('register')">Register</button>
     </div>
 
-    <!-- Login Form -->
     <form id="loginForm" class="form active" onsubmit="handleLogin(event)">
       <input type="text" id="loginUsername" placeholder="Username" required>
       <input type="password" id="loginPassword" placeholder="Password" required>
       <button type="submit">Sign In</button>
     </form>
 
-    <!-- Registration Form -->
     <form id="registerForm" class="form" onsubmit="handleRegister(event)">
       <input type="text" id="regUsername" placeholder="Username" required>
       <input type="password" id="regPassword" placeholder="Password" required>
@@ -28,7 +26,10 @@
     </form>
   </div>
 
+  <!-- SOLANA WEB3 LOADED FIRST -->
+  <script src="https://unpkg.com/@solana/web3.js@1.70.1/lib/index.iife.js"></script>
   <script src="app.js"></script>
+
   <script>
     // Tab Switching
     function switchTab(tab) {
