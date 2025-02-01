@@ -1,89 +1,106 @@
-/* Base Styles */
+/* Color Scheme */
 :root {
-  --primary: #007AFF;
-  --background: #0f172a;
-  --surface: #1e293b;
-  --text: #f8fafc;
+  --primary: #3B82F6;   /* Blue */
+  --background: #F3F4F6;/* Light gray */
+  --surface: #FFFFFF;   /* White */
+  --text: #1F2937;      /* Dark gray */
+  --error: #EF4444;     /* Red */
 }
 
-/* Authentication Page */
+/* Auth Page */
 .auth-container {
   max-width: 400px;
   margin: 2rem auto;
   padding: 2rem;
   background: var(--surface);
   border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.tab-buttons {
+.tabs {
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
 }
 
-.tab-button {
+.tab {
   background: none;
   border: none;
-  color: var(--text);
   padding: 0.5rem 1rem;
   cursor: pointer;
+  color: var(--text);
+  opacity: 0.7;
 }
 
-.tab-button.active {
+.tab.active {
   border-bottom: 2px solid var(--primary);
+  opacity: 1;
 }
 
-.auth-form {
+.form {
   display: none;
 }
 
-.auth-form.active {
-  display: block;
+.form.active {
+  display: grid;
+  gap: 1rem;
+}
+
+input {
+  padding: 0.75rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.5rem;
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
 }
 
 /* Dashboard */
-.dashboard-container {
+.dashboard {
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 240px 1fr;
   min-height: 100vh;
 }
 
 .sidebar {
   background: var(--surface);
   padding: 1rem;
+  border-right: 1px solid #E5E7EB;
 }
 
-.nav-btn {
+.nav-button {
   display: block;
   width: 100%;
   padding: 1rem;
   margin: 0.5rem 0;
+  text-align: left;
   background: none;
   border: none;
-  color: var(--text);
-  text-align: left;
   cursor: pointer;
 }
 
-.nav-btn.active {
+.nav-button.active {
   background: var(--primary);
+  color: white;
   border-radius: 0.5rem;
 }
 
-.content-view {
-  display: none;
+.content-area {
   padding: 2rem;
-}
-
-.content-view.active {
-  display: block;
+  background: var(--background);
 }
 
 .wallet-card {
   background: var(--surface);
   padding: 1rem;
-  margin: 1rem 0;
   border-radius: 0.5rem;
+  margin: 1rem 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
