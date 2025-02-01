@@ -1,18 +1,15 @@
-/* styles.css */
-/* Updated Color Scheme */
 :root {
-  --primary: #3B82F6;       /* Primary blue */
-  --primary-hover: #2563EB; 
-  --background: #111827;    /* Dark background */
-  --surface: #1F2937;       /* Card backgrounds */
-  --text: #F9FAFB;          /* White text */
-  --text-muted: #9CA3AF;    /* Gray text */
-  --border: #374151;        /* Border color */
-  --error: #EF4444;         /* Error red */
-  --success: #10B981;       /* Success green */
+  --primary: #3B82F6;
+  --primary-hover: #2563EB;
+  --background: #111827;
+  --surface: #1F2937;
+  --text: #F9FAFB;
+  --text-muted: #9CA3AF;
+  --border: #374151;
+  --error: #EF4444;
+  --success: #10B981;
 }
 
-/* Base Styles */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -26,7 +23,34 @@ body {
   line-height: 1.6;
 }
 
-/* Auth Page Styles */
+/* Auth Page */
+#alerts {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+.alert {
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  margin: 0.5rem;
+  min-width: 300px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.alert.success {
+  background: var(--success);
+  color: white;
+}
+
+.alert.error {
+  background: var(--error);
+  color: white;
+}
+
 .auth-container {
   max-width: 400px;
   margin: 2rem auto;
@@ -98,35 +122,7 @@ button:hover {
   background: var(--primary-hover);
 }
 
-/* Alert System */
-#alerts {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-}
-
-.alert {
-  padding: 1rem 2rem;
-  border-radius: 0.5rem;
-  margin: 0.5rem;
-  min-width: 300px;
-  text-align: center;
-  font-weight: 500;
-}
-
-.alert.success {
-  background: var(--success);
-  color: white;
-}
-
-.alert.error {
-  background: var(--error);
-  color: white;
-}
-
-/* Dashboard Layout */
+/* Dashboard Styles */
 .dashboard {
   display: grid;
   grid-template-columns: 240px 1fr;
@@ -171,20 +167,12 @@ button:hover {
   display: block;
 }
 
-/* Wallet Card Styles */
 .wallet-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   padding: 1.5rem;
   margin-bottom: 1rem;
-}
-
-.wallet-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
 }
 
 .wallet-type {
@@ -203,74 +191,4 @@ button:hover {
 .wallet-type.bump {
   background: rgba(59, 130, 246, 0.1);
   color: var(--primary);
-}
-
-.wallet-address {
-  font-family: monospace;
-  color: var(--text-muted);
-  margin: 0.5rem 0;
-}
-
-/* Form Elements */
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--text-muted);
-}
-
-select {
-  width: 100%;
-  padding: 0.75rem;
-  background: #374151;
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  color: var(--text);
-}
-
-/* Modal Styles */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: var(--surface);
-  padding: 2rem;
-  border-radius: 1rem;
-  width: 90%;
-  max-width: 400px;
-}
-
-/* Utility Classes */
-.text-success {
-  color: var(--success);
-}
-
-.text-error {
-  color: var(--error);
-}
-
-.mt-2 {
-  margin-top: 0.5rem;
-}
-
-.mb-4 {
-  margin-bottom: 1rem;
-}
-
-.close {
-  float: right;
-  font-size: 1.5rem;
-  cursor: pointer;
 }
