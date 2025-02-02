@@ -22,7 +22,7 @@ class WalletGroupManager {
 
   addWalletToGroup(wallet, groupId) {
     const group = this.findGroup(groupId);
-    if (group) {
+    if (group && !group.wallets.includes(wallet)) {
       group.wallets.push(wallet);
       this.saveToStorage();
     }
@@ -31,6 +31,17 @@ class WalletGroupManager {
   findGroup(groupId) {
     return [...this.groups.bundled, ...this.groups.bump]
            .find(g => g.id === groupId);
+  }
+
+  getGroupSelectOptions() {
+    return [...this.groups.bundled, ...this.groups.bump].map(group => 
+      `<option value="${group.id}">${group.name} (${group.type})</option>`
+    ).join('');
+  }
+
+  async getGroupBalance(groupId) {
+    const group = this.findGroup(groupId);
+    return group ? group.wallets.length * 1.5 : 0;
   }
 
   saveToStorage() {
@@ -43,5 +54,4 @@ class WalletGroupManager {
   }
 }
 
-// Initialize
 const groupManager = new WalletGroupManager();
