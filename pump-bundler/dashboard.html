@@ -3,6 +3,7 @@
 <head>
   <title>Dashboard - Pump Bundler</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <div class="dashboard">
@@ -92,5 +93,30 @@
   <script src="https://unpkg.com/@solana/web3.js@1.70.1/lib/index.iife.js"></script>
   <script src="app.js"></script>
   <script src="groups.js"></script>
+  <script>
+    // Navigation System
+    document.querySelectorAll('.nav-button').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.nav-button, .view').forEach(el => {
+          el.classList.remove('active');
+        });
+        button.classList.add('active');
+        document.getElementById(button.dataset.view + 'View').classList.add('active');
+      });
+    });
+
+    // Group Select Populator
+    function populateGroupSelect() {
+      document.getElementById('bundledGroupSelect').innerHTML = 
+        groupManager.getGroupSelectOptions();
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      if (document.getElementById('bundledGroupSelect')) {
+        populateGroupSelect();
+      }
+    });
+  </script>
 </body>
 </html>
