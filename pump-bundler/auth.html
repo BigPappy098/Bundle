@@ -26,12 +26,10 @@
     </form>
   </div>
 
-  <!-- SOLANA WEB3 LOADED FIRST -->
   <script src="https://unpkg.com/@solana/web3.js@1.70.1/lib/index.iife.js"></script>
   <script src="app.js"></script>
 
   <script>
-    // Tab Switching
     function switchTab(tab) {
       document.querySelectorAll('.tab, .form').forEach(el => {
         el.classList.remove('active');
@@ -41,7 +39,6 @@
       });
     }
 
-    // Alert System
     function showAlert(message, type = 'success') {
       const alertDiv = document.createElement('div');
       alertDiv.className = `alert ${type}`;
